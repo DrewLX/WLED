@@ -61,7 +61,7 @@
   #define MAX_SEGMENT_DATA  4096
 #else
   #ifndef MAX_NUM_SEGMENTS
-    #define MAX_NUM_SEGMENTS  32
+    #define MAX_NUM_SEGMENTS  128
   #endif
   #define MAX_NUM_TRANSITIONS 24
   #define MAX_SEGMENT_DATA  20480
