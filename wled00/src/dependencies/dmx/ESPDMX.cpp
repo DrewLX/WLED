@@ -11,6 +11,8 @@
 // - - - - -
 
 /* ----- LIBRARIES ----- */
+#ifdef ESP8266
+
 #include <Arduino.h>
 
 #include "ESPDMX.h"
@@ -30,12 +32,12 @@ int sendPin = 16;		// DREW - This is the Serial2 TX Pin
 int recievePin = 5;
 
 //DMX value array and size. Entry 0 will hold startbyte
-uint8_t dmxData[dmxMaxChannel] = {};
-int chanSize;
+uint8_t dmxDataStore[dmxMaxChannel] = {};
+int channelSize;
 
 
 void DMXESPSerial::init() {
-  chanSize = defaultMax;
+  channelSize = defaultMax;
 
   pinMode(sendPin, OUTPUT);
   Serial2.begin(DMXSPEED, DMXFORMAT, recievePin, sendPin);
@@ -49,7 +51,7 @@ void DMXESPSerial::init(int chanQuant) {
     chanQuant = defaultMax;
   }
 
-  chanSize = chanQuant;
+  channelSize = chanQuant;
 
   pinMode(sendPin, OUTPUT);
   Serial2.begin(DMXSPEED, DMXFORMAT, recievePin, sendPin);
@@ -62,7 +64,7 @@ uint8_t DMXESPSerial::read(int Channel) {
 
   if (Channel < 1) Channel = 1;
   if (Channel > dmxMaxChannel) Channel = dmxMaxChannel;
-  return(dmxData[Channel]);
+  return(dmxDataStore[Channel]);
 }
 
 // Function to send DMX data
@@ -70,11 +72,11 @@ void DMXESPSerial::write(int Channel, uint8_t value) {
   if (dmxStarted == false) init();
 
   if (Channel < 1) Channel = 1;
-  if (Channel > chanSize) Channel = chanSize;
+  if (Channel > channelSize) Channel = channelSize;
   if (value < 0) value = 0;
   if (value > 255) value = 255;
 
-  dmxData[Channel] = value;
+  dmxDataStore[Channel] = value;
 }
 
 void DMXESPSerial::end() {
@@ -104,3 +106,5 @@ void DMXESPSerial::update() {
 }
 
 // Function to update the DMX bus
+
+#endif
