@@ -35,16 +35,16 @@ void handleDMX()
           dmx.write(DMXAddr, 0);
           break;
         case 1:        // Red
-          dmx.write(DMXAddr, r);
+          dmx.write(DMXAddr, r * brightness / 255);
           break;
         case 2:        // Green
-          dmx.write(DMXAddr, g);
+          dmx.write(DMXAddr, g * brightness / 255);
           break;
         case 3:        // Blue
-          dmx.write(DMXAddr, b);
+          dmx.write(DMXAddr, b * brightness / 255);
           break;
         case 4:        // White
-          dmx.write(DMXAddr, w);
+          dmx.write(DMXAddr, w * brightness / 255);
           break;
         case 5:        // Shutter channel. Controls the brightness.
           dmx.write(DMXAddr, brightness);

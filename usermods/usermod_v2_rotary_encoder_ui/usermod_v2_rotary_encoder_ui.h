@@ -53,7 +53,7 @@
 
 class RotaryEncoderUIUsermod : public Usermod {
 private:
-  int fadeAmount = 10;             // Amount to change every step (brightness)
+  int fadeAmount = 5;             // Amount to change every step (brightness)
   unsigned long currentTime;
   unsigned long loopTime;
   int8_t pinA = ENCODER_DT_PIN;       // DT from encoder

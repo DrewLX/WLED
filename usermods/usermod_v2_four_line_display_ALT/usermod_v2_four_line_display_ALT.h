@@ -81,7 +81,7 @@
 
 #ifndef FLD_TYPE
   #ifndef FLD_SPI_DEFAULT
-    #define FLD_TYPE SSD1306
+    #define FLD_TYPE SSD1306_64
   #else
     #define FLD_TYPE SSD1306_SPI
   #endif
@@ -89,7 +89,7 @@
 
 // When to time out to the clock or blank the screen
 // if SLEEP_MODE_ENABLED.
-#define SCREEN_TIMEOUT_MS  60*1000    // 1 min
+#define SCREEN_TIMEOUT_MS  60*1000*10    // 1 min
 
 // Minimum time between redrawing screen in ms
 #define USER_LOOP_REFRESH_RATE_MS 1000
@@ -201,6 +201,9 @@ class FourLineDisplayUsermod : public Usermod {
     // network here
     void setup() {
       if (type == NONE || !enabled) return;
+
+      Serial.println("We're using the alt one!");
+
 
       bool isHW, isSPI = (type == SSD1306_SPI || type == SSD1306_SPI64);
       PinOwner po = PinOwner::UM_FourLineDisplay;

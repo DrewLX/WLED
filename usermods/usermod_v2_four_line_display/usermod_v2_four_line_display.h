@@ -25,8 +25,8 @@
 
 //The SCL and SDA pins are defined here. 
 #ifdef ARDUINO_ARCH_ESP32
-  #define HW_PIN_SCL 22
-  #define HW_PIN_SDA 21
+  #define HW_PIN_SCL 18
+  #define HW_PIN_SDA 19
   #define HW_PIN_CLOCKSPI 18
   #define HW_PIN_DATASPI 23
   #ifndef FLD_PIN_SCL
@@ -78,17 +78,12 @@
   #endif
 #endif
 
-#ifndef FLD_TYPE
-  #ifndef FLD_SPI_DEFAULT
-    #define FLD_TYPE SSD1306
-  #else
-    #define FLD_TYPE SSD1306_SPI
-  #endif
-#endif
+
+    #define FLD_TYPE SSD1306_64
 
 // When to time out to the clock or blank the screen
 // if SLEEP_MODE_ENABLED.
-#define SCREEN_TIMEOUT_MS  60*1000    // 1 min
+#define SCREEN_TIMEOUT_MS  60*1000*5    // 1 min
 
 #define TIME_INDENT        0
 #define DATE_INDENT        2
@@ -135,7 +130,7 @@ class FourLineDisplayUsermod : public Usermod {
     int8_t ioPin[5] = {FLD_PIN_CLOCKSPI, FLD_PIN_DATASPI, FLD_PIN_CS, FLD_PIN_DC, FLD_PIN_RESET}; // SPI pins: CLK, MOSI, CS, DC, RST
     uint32_t ioFrequency = 1000000;  // in Hz (minimum is 500kHz, baseline is 1MHz and maximum should be 20MHz)
     #endif
-    DisplayType type = FLD_TYPE;    // display type
+    DisplayType type = SSD1306_64;    // display type
     bool flip = false;              // flip display 180°
     uint8_t contrast = 10;          // screen contrast
     uint8_t lineHeight = 1;         // 1 row or 2 rows
@@ -203,6 +198,18 @@ class FourLineDisplayUsermod : public Usermod {
       }
 
       DEBUG_PRINTLN(F("Allocating display."));
+
+      DEBUG_PRINTLN(ioPin[0]);
+      DEBUG_PRINTLN(ioPin[1]);
+      type = SSD1306_64;
+
+      ioPin[0] = FLD_PIN_SCL;
+          ioPin[1] = FLD_PIN_SDA;
+
+          DEBUG_PRINTLN(ioPin[0]);
+      DEBUG_PRINTLN(ioPin[1]);
+      // DEBUG_PRINTLN(type);
+
       switch (type) {
         case SSD1306:
           if (!isHW) u8x8 = (U8X8 *) new U8X8_SSD1306_128X32_UNIVISION_SW_I2C(ioPin[0], ioPin[1]); // SCL, SDA, reset
@@ -215,9 +222,11 @@ class FourLineDisplayUsermod : public Usermod {
           lineHeight = 2;
           break;
         case SSD1306_64:
+          DEBUG_PRINTLN(F("THIS DISPLAY!"));
+          
           if (!isHW) u8x8 = (U8X8 *) new U8X8_SSD1306_128X64_NONAME_SW_I2C(ioPin[0], ioPin[1]); // SCL, SDA, reset
           else       u8x8 = (U8X8 *) new U8X8_SSD1306_128X64_NONAME_HW_I2C(U8X8_PIN_NONE, ioPin[0], ioPin[1]); // Pins are Reset, SCL, SDA
-          lineHeight = 2;
+          lineHeight = 1;
           break;
         case SSD1305:
           if (!isHW) u8x8 = (U8X8 *) new U8X8_SSD1305_128X32_NONAME_SW_I2C(ioPin[0], ioPin[1]); // SCL, SDA, reset
@@ -443,7 +452,7 @@ class FourLineDisplayUsermod : public Usermod {
       uint8_t printedChars;
       switch(lineType) {
         case FLD_LINE_BRIGHTNESS:
-          sprintf_P(lineBuffer, PSTR("Brightness %3d"), bri);
+          sprintf_P(lineBuffer, PSTR("Bright %3d%"), bri*100/255);
           drawString(2, line*lineHeight, lineBuffer);
           break;
         case FLD_LINE_EFFECT_SPEED:

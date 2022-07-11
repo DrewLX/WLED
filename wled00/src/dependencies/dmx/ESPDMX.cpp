@@ -26,7 +26,8 @@
 #define BREAKFORMAT    SERIAL_8N1
 
 bool dmxStarted = false;
-int sendPin = 17;		// DREW - This is the Serial2 TX Pin
+int sendPin = 16;		// DREW - This is the Serial2 TX Pin
+int recievePin = 5;
 
 //DMX value array and size. Entry 0 will hold startbyte
 uint8_t dmxData[dmxMaxChannel] = {};
@@ -36,8 +37,8 @@ int chanSize;
 void DMXESPSerial::init() {
   chanSize = defaultMax;
 
-  Serial2.begin(DMXSPEED);
   pinMode(sendPin, OUTPUT);
+  Serial2.begin(DMXSPEED, DMXFORMAT, recievePin, sendPin);
   dmxStarted = true;
 }
 
@@ -50,8 +51,8 @@ void DMXESPSerial::init(int chanQuant) {
 
   chanSize = chanQuant;
 
-  Serial2.begin(DMXSPEED);
   pinMode(sendPin, OUTPUT);
+  Serial2.begin(DMXSPEED, DMXFORMAT, recievePin, sendPin);
   dmxStarted = true;
 }
 
@@ -87,14 +88,14 @@ void DMXESPSerial::update() {
 
   //Send break
   digitalWrite(sendPin, HIGH);
-  Serial2.begin(BREAKSPEED, BREAKFORMAT);
+  Serial2.begin(BREAKSPEED, BREAKFORMAT, recievePin, sendPin);
   Serial2.write(0);
   Serial2.flush();
   delay(1);
   Serial2.end();
 
   //send data
-  Serial2.begin(DMXSPEED, DMXFORMAT);
+  Serial2.begin(DMXSPEED, DMXFORMAT, recievePin, sendPin);
   digitalWrite(sendPin, LOW);
   Serial2.write(dmxData, chanSize);
   Serial2.flush();
