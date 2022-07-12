@@ -317,7 +317,7 @@ void WLED::setup()
   pinManager.allocatePin(1, true, PinOwner::DebugOut); // GPIO1 reserved for debug output
 #endif
 #ifdef WLED_ENABLE_DMX //reserve GPIO2 as hardcoded DMX pin
-  pinManager.allocatePin(2, true, PinOwner::DMX);
+  pinManager.allocatePin(16, true, PinOwner::DMX);
 #endif
 
   DEBUG_PRINTLN(F("Registering usermods ..."));

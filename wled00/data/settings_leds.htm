@@ -38,7 +38,7 @@
         //check for pin conflicts
         if (nm=="L0" || nm=="L1" || nm=="L2" || nm=="L3" || nm=="L4" || nm=="RL" || nm=="BT" || nm=="IR")
           if (LCs[i].value!="" && LCs[i].value!="-1") {
-            if (d.um_p && d.um_p.some((e)=>e==parseInt(LCs[i].value,10))) {alert(`Sorry, pins ${JSON.stringify(d.um_p)} can't be used.`);LCs[i].value="";LCs[i].focus();return false;}
+            if (d.um_p && d.um_p.some((e)=>e==parseInt(LCs[i].value,10))) {alert(`Sorry, pins ${JSON.stringify(d.um_p)} can't be used. \r\n\r\n For Garlic Bread Pix1 is pin 2, Pix2 is pin 4, Pix3 is pin 12 and Pix4 is pin 13`);LCs[i].value="";LCs[i].focus();return false;}
             else if (LCs[i].value > 5 && LCs[i].value < 12) {alert("Sorry, pins 6-11 can not be used.");LCs[i].value="";LCs[i].focus();return false;}
             else if (!(nm == "IR" || nm=="BT") && LCs[i].value > 33) {alert("Sorry, pins >33 are input only.");LCs[i].value="";LCs[i].focus();return false;}
             for (j=i+1; j<LCs.length; j++)
