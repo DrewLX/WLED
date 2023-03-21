@@ -12,6 +12,8 @@
 #define presetWaitingForAnswer 70
 #define presetProcessingAnswers 80
 
+#define localMode // comment out to use cloud api
+
 enum gameState {
   holding,
   q1,
@@ -49,7 +51,12 @@ class Vestaboard : public Usermod {
 
     gameState state = holding;
 
-    const char* serverName = "https://platform.vestaboard.com/subscriptions/7eb5110e-e974-4b19-8ead-3f3b2c1127c6/message";
+    #ifdef localMode 
+        const char* serverName = "http://vestaboard.local:7000/local-api/message";
+    #else
+        const char* serverName = "https://platform.vestaboard.com/subscriptions/7eb5110e-e974-4b19-8ead-3f3b2c1127c6/message";
+    #endif
+
 
     String answer1 = "";
     String answer2 = "";
@@ -423,8 +430,17 @@ class Vestaboard : public Usermod {
     }
 
   void sendMessage(String m){
-  Serial.print("sendMessage begin: ");
-  m = "{\"characters\":[" + m + "]}";
+    if (m == "") {
+      Serial.println("Message is empty... not sending");
+      m = "[14,15,0,19,20,18,9,14,7,0,3,15,14,6,9,7,21,18,5,4,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]";
+    }
+  Serial.print("Attempting to send message to vestaboard begin: ");
+  #ifdef localMode
+    m = "[" + m + "]";
+  #else
+    m = "{\"characters\":[" + m + "]}";
+  #endif
+  
   Serial.println(m);
 
 
@@ -447,7 +463,8 @@ class Vestaboard : public Usermod {
   }
 
   vestaClient->onError([](void * arg, AsyncClient * client, int error){
-    Serial.println("Connect Error");
+    Serial.print("Connect Error: ");
+    Serial.println(error);
     vestaClient = NULL;
     delete client;
   }, NULL);
@@ -470,10 +487,16 @@ class Vestaboard : public Usermod {
         Serial.write(d[i]);
     }, NULL);
 
+    #ifdef localMode
+    client->write("POST /local-api/message HTTP/1.1\r\n");
+    client->write("Host: 192.168.0.101:7000\r\n");
+    client->write("X-Vestaboard-Local-Api-Key: M2Q5N2UzNGMtMGY4Zi00YmEyLWJjNjYtMDM1YTcwMTQxZmZi\r\n");
+   #else
     client->write("POST /subscriptions/7eb5110e-e974-4b19-8ead-3f3b2c1127c6/message HTTP/1.1\r\n");
     client->write("Host: platform.vestaboard.com\r\n");
     client->write("X-Vestaboard-Api-Key: 23ec8147-cd58-4c5e-8ab9-a5deb5f99d97\r\n");
     client->write("X-Vestaboard-Api-Secret: ZGRjOWE4ZWYtNjk5OC00ZDQwLTllMDMtNmIzOTE4YzQ2MzFj\r\n");
+   #endif 
     client->write("Connection: close\r\n");
     client->write("Content-Type: application/json\r\n");
     client->write("Content-Length: ");
@@ -483,12 +506,23 @@ class Vestaboard : public Usermod {
     client->write("\r\n\r\n"); 
   }, NULL);
 
+  #ifdef localMode
+  Serial.println("Attempt vestaboard connection..");
+  if(!vestaClient->connect("192.168.0.101", 7000)){
+    Serial.println("Connect Fail");
+    AsyncClient * client = vestaClient;
+    vestaClient = NULL;
+    delete client;
+  }
+  #else
   if(!vestaClient->connect("platform.vestaboard.com", 80)){
     Serial.println("Connect Fail");
     AsyncClient * client = vestaClient;
     vestaClient = NULL;
     delete client;
   }
+  #endif
+  
 }
 
   void addToConfig(JsonObject& root)
